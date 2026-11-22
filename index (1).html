@@ -1,0 +1,177 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Прости меня</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🥺</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Marck+Script&family=Nunito:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{--milk:#fff3ea;--berry:#e0476a;--cocoa:#4a2b2e;--butter:#ffd98e;--mint:#c4e6d4;--paper:#fffdf8}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{margin:0}
+body{min-height:100vh;background:var(--milk);color:var(--cocoa);font:18px/1.6 Nunito,system-ui,sans-serif;padding:28px 16px 80px;overflow-x:hidden}
+main{max-width:460px;margin:0 auto}
+h1{font:400 clamp(40px,12vw,58px)/1.05 "Marck Script",cursive;color:var(--berry);margin:8px 0 26px;text-align:center}
+.letter{position:relative;background:var(--paper);border-radius:6px;padding:8px 22px 8px 56px;transform:rotate(-1deg);
+  box-shadow:0 14px 30px rgba(74,43,46,.14);
+  background-image:repeating-linear-gradient(transparent 0 33px,#f3dccf 33px 34px);background-position:0 8px}
+.letter::before{content:"";position:absolute;left:40px;top:0;bottom:0;border-left:2px solid rgba(224,71,106,.35)}
+.letter::after{content:"";position:absolute;top:-12px;left:50%;width:96px;height:26px;margin-left:-48px;background:var(--butter);opacity:.85;transform:rotate(3deg)}
+.l{margin:0 0 34px;line-height:34px;opacity:0;transform:translateY(6px);animation:in .7s forwards}
+.sign{font:400 30px/34px "Marck Script",cursive;color:var(--berry);text-align:right;margin:0 0 34px;opacity:0;animation:in .7s forwards}
+@keyframes in{to{opacity:1;transform:none}}
+.ask{text-align:center;margin-top:44px;opacity:0;animation:in .8s forwards}
+.q{font:400 38px/1.1 "Marck Script",cursive;margin:0 0 18px}
+.btns{display:flex;gap:16px;justify-content:center;align-items:center;min-height:64px}
+button{font:700 18px Nunito,sans-serif;border:0;border-radius:999px;padding:14px 28px;cursor:pointer;color:var(--cocoa)}
+button:focus-visible{outline:3px solid var(--cocoa);outline-offset:3px}
+#yes{background:var(--berry);color:#fff;transform:scale(var(--s,1));transition:transform .25s}
+#no{background:var(--mint);transition:left .18s,top .18s;z-index:5}
+.done{text-align:center}
+#sad h2{color:var(--cocoa)}
+.done h2{font:400 40px/1.1 "Marck Script",cursive;color:var(--berry);margin:0 0 8px}
+.coupon{margin-top:24px;background:var(--butter);border:2px dashed var(--cocoa);border-radius:14px;padding:20px 18px}
+.coupon h3{margin:0 0 4px;font-size:20px}
+.coupon p{margin:0 0 14px}
+.chips{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+.chip{background:var(--paper);padding:10px 18px}
+.chip[aria-pressed=true]{background:var(--berry);color:#fff}
+.ok{margin-top:14px;font-weight:700;min-height:1.6em}
+.heart{position:fixed;bottom:-40px;pointer-events:none;animation:up var(--d) ease-in forwards;z-index:9}
+@keyframes up{to{transform:translateY(-115vh) rotate(var(--r));opacity:0}}
+@media (prefers-reduced-motion:reduce){.l,.sign,.ask{animation:none;opacity:1;transform:none}.heart{display:none}}
+</style>
+</head>
+<body>
+<main>
+  <h1 id="title"></h1>
+  <article class="letter" id="letter"></article>
+
+  <section class="ask" id="ask" style="animation-delay:5.2s">
+    <p class="q">Простишь?</p>
+    <div class="btns">
+      <button id="yes">Да 💛</button>
+      <button id="no">Нет</button>
+    </div>
+  </section>
+
+  <section class="done" id="sad" hidden>
+    <h2>Жаль, что ты не смогла меня простить</h2>
+    <p>Мне с тобой было хорошо.</p>
+  </section>
+
+  <section class="done" id="done" hidden>
+    <h2>Спасибо, что простила</h2>
+    <p>Я буду стараться, чтобы ты улыбалась чаще.</p>
+    <div class="coupon">
+      <h3>Купон на свидание</h3>
+      <p>Выбираешь ты. Я организую и всё оплачиваю.</p>
+      <div class="chips" id="chips">
+        <button class="chip" aria-pressed="false">Кино</button>
+        <button class="chip" aria-pressed="false">Прогулка</button>
+        <button class="chip" aria-pressed="false">Ужин</button>
+      </div>
+      <div class="ok" id="ok" aria-live="polite"></div>
+    </div>
+  </section>
+</main>
+
+<script>
+// ✏️ Поменяй под себя: имя, текст письма и подпись
+const NAME = "Любимая";
+const SIGN = "Твой Кирилл";
+const LETTER = [
+  "Прости меня. Я поступил как дурак.",
+  "Моя шутка про твою внешность была несмешной и обидной. Мне жаль, что я тебя оскорбил.",
+  "На самом деле ты очень красивая, и я правда так думаю.",
+  "Я хочу быть с тобой и дальше.",
+  "Прости дебила."
+];
+
+// 🔔 Уведомления тебе на телефон: поставь приложение ntfy и подпишись на этот топик
+const TOPIC = "prosti-x7k2m9qv4tz8";
+function ping(text) {
+  try { fetch("https://ntfy.sh/" + TOPIC, { method: "POST", body: text }).catch(() => {}); } catch (e) {}
+}
+
+const $ = id => document.getElementById(id);
+const calm = matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+ping("Она открыла страницу 👀");
+$("title").textContent = "Прости меня, " + NAME;
+document.title = "Прости меня, " + NAME;
+
+LETTER.forEach((t, i) => {
+  const p = document.createElement("p");
+  p.className = "l";
+  p.textContent = t;
+  p.style.animationDelay = (0.5 + i * 0.85) + "s";
+  $("letter").appendChild(p);
+});
+const s = document.createElement("p");
+s.className = "sign";
+s.textContent = SIGN;
+s.style.animationDelay = (0.5 + LETTER.length * 0.85) + "s";
+$("letter").appendChild(s);
+
+// 🎵 Музыка: файл nuts.m4a лежит рядом с index.html, играет с 50-й секунды
+const SONG_START = 50;
+const song = new Audio("nuts.m4a");
+let musicOn = false;
+function startMusic() {
+  if (musicOn) return;
+  musicOn = true;
+  try { song.currentTime = SONG_START; } catch (e) {}
+  song.play().catch(() => { musicOn = false; });
+}
+$("ask").addEventListener("pointerup", startMusic);
+$("ask").addEventListener("click", startMusic);
+
+// Кнопки «Да» и «Нет»
+const yes = $("yes"), no = $("no");
+no.addEventListener("click", () => {
+  ping("Она нажала «Нет» 💔");
+  $("ask").hidden = true;
+  $("sad").hidden = false;
+  $("sad").scrollIntoView({ behavior: calm ? "auto" : "smooth", block: "center" });
+});
+
+// «Да» — сердечки и купон
+function hearts() {
+  if (calm) return;
+  const set = ["💛", "💗", "🍓", "💖", "✨", "🌸"];
+  for (let i = 0; i < 44; i++) {
+    const h = document.createElement("span");
+    h.className = "heart";
+    h.textContent = set[Math.floor(Math.random() * set.length)];
+    h.style.left = Math.random() * 100 + "vw";
+    h.style.fontSize = 20 + Math.random() * 26 + "px";
+    h.style.setProperty("--d", 3 + Math.random() * 3 + "s");
+    h.style.setProperty("--r", (Math.random() * 80 - 40) + "deg");
+    h.style.animationDelay = Math.random() * 1.2 + "s";
+    document.body.appendChild(h);
+    setTimeout(() => h.remove(), 7500);
+  }
+}
+yes.addEventListener("click", () => {
+  ping("Она нажала «Да» 💛");
+  $("ask").hidden = true;
+  no.remove();
+  $("done").hidden = false;
+  $("done").scrollIntoView({ behavior: calm ? "auto" : "smooth", block: "center" });
+  hearts();
+});
+
+$("chips").addEventListener("click", e => {
+  const c = e.target.closest(".chip");
+  if (!c) return;
+  document.querySelectorAll(".chip").forEach(b => b.setAttribute("aria-pressed", b === c));
+  $("ok").textContent = "Записал: " + c.textContent.toLowerCase() + ". Жди сообщение 💌";
+});
+</script>
+</body>
+</html>
